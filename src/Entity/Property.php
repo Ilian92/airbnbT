@@ -62,6 +62,9 @@ class Property
     #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'property')]
     private Collection $reviews;
 
+    #[ORM\Column(nullable: true)]
+    private ?string $note = null;
+
     public function __construct()
     {
         $this->bookings = new ArrayCollection();
@@ -261,6 +264,18 @@ class Property
                 $review->setProperty(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNote(): ?string
+    {
+        return $this->note;
+    }
+
+    public function setNote(?string $note): static
+    {
+        $this->note = $note;
 
         return $this;
     }
