@@ -1,0 +1,60 @@
+App\Entity\User:
+    user_host_{1..5}:
+        email (unique): "<safeEmail()>"
+        password: "password123"
+        firstName: "<firstName()>"
+        lastName: "<lastName()>"
+        phone: "<phoneNumber()>"
+        roles: ["ROLE_HOST"]
+        createdAt: '<dateTimeBetween("-2 years", "now")>'
+        isVerified: true
+        address: "<streetAddress()>"
+        city: "<city()>"
+        postalCode: "<numberBetween(10000, 99999)>"
+
+    user_guest_{1..15}:
+        email (unique): "<safeEmail()>"
+        password: '<sha256("password123")>'
+        firstName: "<firstName()>"
+        lastName: "<lastName()>"
+        phone: "<phoneNumber()>"
+        roles: ["ROLE_USER"]
+        createdAt: '<dateTimeBetween("-2 years", "now")>'
+        isVerified: "<boolean(90)>"
+        address: "<streetAddress()>"
+        city: "<city()>"
+        postalCode: "<numberBetween(10000, 99999)>"
+
+App\Entity\Property:
+    property_{1..20}:
+        title: "<sentence(3, true)>"
+        description: "<paragraph(3)>"
+        address: "<streetAddress()>"
+        city: "<city()>"
+        pricePerNight: "<randomFloat(2, 50, 500)>"
+        maxGuests: "<numberBetween(1, 12)>"
+        bedrooms: "<numberBetween(1, 6)>"
+        bathrooms: "<numberBetween(1, 4)>"
+        isActive: "<boolean(85)>"
+        createdAt: '<dateTimeBetween("-1 year", "now")>'
+        host: "@user_host_<numberBetween(1, 5)>"
+        note: "50%? <sentence(10)>"
+
+App\Entity\Booking:
+    booking_{1..50}:
+        checkIn: '<dateTimeBetween("2025-04-01", "2025-12-01")>'
+        checkOut: '<dateTimeBetween("2025-04-03", "2025-12-31")>'
+        totalPrice: "<randomFloat(2, 200, 3000)>"
+        status: '<randomElement(["pending", "confirmed", "cancelled", "completed"])>'
+        createdAt: '<dateTimeBetween("-6 months", "now")>'
+        property: "@property_<numberBetween(1, 20)>"
+        guest: "@user_guest_<numberBetween(1, 15)>"
+
+App\Entity\Review:
+    review_{1..30}:
+        rating: "<numberBetween(1, 5)>"
+        comment: "70%? <paragraph(2)>"
+        createdAt: '<dateTimeBetween("-6 months", "now")>'
+        property: "@property_<numberBetween(1, 20)>"
+        guest: "@user_guest_<numberBetween(1, 15)>"
+        booking: "@booking_<current()>"
