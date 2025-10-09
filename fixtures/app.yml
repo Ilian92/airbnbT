@@ -38,7 +38,7 @@ App\Entity\Property:
         isActive: "<boolean(85)>"
         createdAt: '<dateTimeBetween("-1 year", "now")>'
         host: "@user_host_<numberBetween(1, 5)>"
-        note: "50%? <sentence(10)>"
+        note: "50%? <numberBetween(1, 5)>"
 
 App\Entity\Booking:
     booking_{1..50}:

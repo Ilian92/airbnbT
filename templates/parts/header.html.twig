@@ -1,0 +1,37 @@
+<header class="header">
+    <a href="{{ path('app_home') }}" class="logo">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 1c2 0 3.46.96 4.75 3.27L30.35 22a5 5 0 0 1-4.76 7h-19.2a5 5 0 0 1-4.75-7l9.6-17.73C12.54 1.96 14 1 16 1z"/>
+        </svg>
+        <span>airbnb</span>
+    </a>
+
+    <div class="search-bar">
+        <input type="text" placeholder="Où allez-vous ?">
+        <div class="divider"></div>
+        <input type="text" placeholder="Quand ?">
+        <div class="divider"></div>
+        <input type="text" placeholder="Voyageurs">
+        <button class="search-btn">
+            <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+                <path fill="currentColor" d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0zm-1.06 4.44a6 6 0 1 1 1.06-1.06l3.81 3.81a.75.75 0 1 1-1.06 1.06l-3.81-3.81z"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="nav-right">
+        <a href="#" class="nav-link">Mettez votre logement sur Airbnb</a>
+        <div class="user-menu">
+            <svg class="hamburger" viewBox="0 0 16 16" fill="currentColor">
+                <rect y="1" width="16" height="2" rx="1"/>
+                <rect y="7" width="16" height="2" rx="1"/>
+                <rect y="13" width="16" height="2" rx="1"/>
+            </svg>
+            <div class="user-avatar">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</header>

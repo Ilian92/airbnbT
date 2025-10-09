@@ -1,0 +1,50 @@
+{# 
+    Composant réutilisable pour afficher une carte de propriété
+    Variables attendues:
+    - property: objet Property avec les propriétés suivantes
+        - id
+        - title
+        - city
+        - pricePerNight
+        - bedrooms (optionnel)
+        - maxGuests (optionnel)
+    - imageUrl (optionnel): URL de l'image, sinon utilise un placeholder
+#}
+
+<a href="{{ path('app_property_show', {'id': property.id}) }}" class="property-card">
+    <div class="property-image">
+        {% if imageUrl is defined %}
+            <img src="{{ imageUrl }}" alt="{{ property.title ?? 'Property' }}" loading="lazy">
+        {% else %}
+            <img src="https://picsum.photos/seed/property{{ property.id ?? random(1000) }}/400/300" alt="{{ property.title ?? 'Property' }}" loading="lazy">
+        {% endif %}
+        <button class="favorite-btn">
+            <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+                <path stroke="currentColor" stroke-width="1.5" d="M8 13.5s-6-4-6-7.5c0-1.933 1.567-3.5 3.5-3.5 1.205 0 2.276.609 2.905 1.535L8 4.5l.595-.465C9.224 3.109 10.295 2.5 11.5 2.5c1.933 0 3.5 1.567 3.5 3.5 0 3.5-6 7.5-6 7.5z"/>
+            </svg>
+        </button>
+    </div>
+    <div class="property-info">
+        <div class="property-location">
+            <span class="location-name">{{ property.city ?? 'Location' }}</span>
+            <div class="rating">
+                <span>⭐</span>
+                <span>{{ rating ?? '4.5' }}</span>
+            </div>
+        </div>
+        <div class="property-details">
+            {{ property.title ?? 'Beautiful property' }}
+        </div>
+        <div class="property-details">
+            {% if property.bedrooms is defined %}
+                {{ property.bedrooms }} chambre{{ property.bedrooms > 1 ? 's' : '' }}
+            {% endif %}
+            {% if property.maxGuests is defined %}
+                · {{ property.maxGuests }} voyageur{{ property.maxGuests > 1 ? 's' : '' }}
+            {% endif %}
+        </div>
+        <div class="property-price">
+            <span class="price-amount">{{ property.pricePerNight ?? '100' }} €</span> / nuit
+        </div>
+    </div>
+</a>

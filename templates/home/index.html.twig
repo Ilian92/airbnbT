@@ -1,0 +1,596 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Airbnb - Locations de vacances, cabanes, maisons de plage et plus{% endblock %}
+
+{% block stylesheets %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        color: #222;
+        line-height: 1.5;
+    }
+
+    /* Header / Navbar */
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-bottom: 1px solid #ebebeb;
+        z-index: 100;
+        padding: 20px 80px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 24px;
+        font-weight: 700;
+        color: #FF385C;
+        text-decoration: none;
+    }
+
+    .logo svg {
+        width: 32px;
+        height: 32px;
+        fill: #FF385C;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 40px;
+        padding: 8px 8px 8px 24px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        transition: box-shadow 0.2s;
+        cursor: pointer;
+    }
+
+    .search-bar:hover {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+    }
+
+    .search-bar input {
+        border: none;
+        outline: none;
+        font-size: 14px;
+        padding: 0 16px;
+        min-width: 200px;
+    }
+
+    .search-bar .divider {
+        width: 1px;
+        height: 24px;
+        background: #ddd;
+    }
+
+    .search-btn {
+        background: #FF385C;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: white;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .nav-link {
+        text-decoration: none;
+        color: #222;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 22px;
+        transition: background 0.2s;
+    }
+
+    .nav-link:hover {
+        background: #f7f7f7;
+    }
+
+    .user-menu {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid #ddd;
+        border-radius: 21px;
+        padding: 5px 5px 5px 12px;
+        cursor: pointer;
+        transition: box-shadow 0.2s;
+    }
+
+    .user-menu:hover {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+    }
+
+    .hamburger {
+        width: 16px;
+        height: 16px;
+    }
+
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #717171;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+    }
+
+    /* Hero Section */
+    .hero {
+        margin-top: 80px;
+        position: relative;
+        height: 600px;
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
+                    url('https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=1600&h=900&fit=crop');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+    }
+
+    .hero-content h1 {
+        font-size: 56px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .hero-content p {
+        font-size: 24px;
+        margin-bottom: 32px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .cta-button {
+        background: #FF385C;
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.2s;
+    }
+
+    .cta-button:hover {
+        transform: scale(1.05);
+        background: #E31C5F;
+    }
+
+    /* Categories */
+    .categories {
+        padding: 40px 80px;
+        border-bottom: 1px solid #ebebeb;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .categories-list {
+        display: flex;
+        gap: 40px;
+    }
+
+    .category-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+        padding-bottom: 12px;
+        border-bottom: 2px solid transparent;
+        text-decoration: none;
+        color: #222;
+    }
+
+    .category-item:hover,
+    .category-item.active {
+        opacity: 1;
+        border-bottom-color: #222;
+    }
+
+    .category-icon {
+        font-size: 24px;
+    }
+
+    .category-label {
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    /* Main Content */
+    .container {
+        padding: 40px 80px;
+    }
+
+    .section-title {
+        font-size: 32px;
+        font-weight: 600;
+        margin-bottom: 32px;
+    }
+
+    /* Property Grid */
+    .property-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 40px 24px;
+    }
+
+    .property-card {
+        cursor: pointer;
+        text-decoration: none;
+        color: #222;
+    }
+
+    .property-image {
+        position: relative;
+        width: 100%;
+        height: 280px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 12px;
+        background: #f0f0f0;
+    }
+
+    .property-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .property-card:hover .property-image img {
+        transform: scale(1.05);
+    }
+
+    .favorite-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(255,255,255,0.9);
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .favorite-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .property-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .property-location {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .location-name {
+        font-weight: 600;
+        font-size: 15px;
+    }
+
+    .rating {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 14px;
+    }
+
+    .property-details {
+        color: #717171;
+        font-size: 14px;
+    }
+
+    .property-price {
+        margin-top: 8px;
+    }
+
+    .price-amount {
+        font-weight: 600;
+    }
+
+    /* Inspiration Section */
+    .inspiration-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        margin-bottom: 60px;
+    }
+
+    .inspiration-card {
+        text-decoration: none;
+        color: #222;
+    }
+
+    .inspiration-image {
+        width: 100%;
+        height: 280px;
+        border-radius: 12px;
+        background: #f0f0f0;
+        margin-bottom: 12px;
+        overflow: hidden;
+    }
+
+    .inspiration-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .inspiration-card h3 {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    /* Footer */
+    .footer {
+        background: #f7f7f7;
+        border-top: 1px solid #ebebeb;
+        padding: 48px 80px;
+    }
+
+    .footer-content {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 48px;
+        margin-bottom: 48px;
+    }
+
+    .footer-section h4 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .footer-links {
+        list-style: none;
+    }
+
+    .footer-links li {
+        margin-bottom: 12px;
+    }
+
+    .footer-links a {
+        color: #222;
+        text-decoration: none;
+        font-size: 14px;
+        transition: text-decoration 0.2s;
+    }
+
+    .footer-links a:hover {
+        text-decoration: underline;
+    }
+
+    .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 24px;
+        border-top: 1px solid #ddd;
+        font-size: 14px;
+        color: #717171;
+    }
+
+    .footer-social {
+        display: flex;
+        gap: 24px;
+    }
+
+    .footer-social a {
+        color: #222;
+        text-decoration: none;
+        font-size: 18px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .header,
+        .container,
+        .categories,
+        .footer {
+            padding-left: 40px;
+            padding-right: 40px;
+        }
+
+        .property-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+
+        .inspiration-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header,
+        .container,
+        .categories,
+        .footer {
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+
+        .search-bar {
+            display: none;
+        }
+
+        .hero-content h1 {
+            font-size: 36px;
+        }
+
+        .property-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .inspiration-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .footer-content {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <!-- Header -->
+    {% include 'parts/header.html.twig' %}
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Trouvez votre prochaine aventure</h1>
+            <p>Découvrez des logements uniques partout dans le monde</p>
+            <a href="#properties" class="cta-button">Explorer les destinations</a>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    {# <section class="categories">
+        <div class="categories-list">
+            <a href="#" class="category-item active">
+                <span class="category-icon">🏖️</span>
+                <span class="category-label">Plages</span>
+            </a>
+            <a href="#" class="category-item">
+                <span class="category-icon">🏔️</span>
+                <span class="category-label">Montagnes</span>
+            </a>
+            <a href="#" class="category-item">
+                <span class="category-icon">🏡</span>
+                <span class="category-label">Cabanes</span>
+            </a>
+            <a href="#" class="category-item">
+                <span class="category-icon">🏰</span>
+                <span class="category-label">Châteaux</span>
+            </a>
+            <a href="#" class="category-item">
+                <span class="category-icon">🏊</span>
+                <span class="category-label">Piscines</span>
+            </a>
+            <a href="#" class="category-item">
+                <span class="category-icon">🌴</span>
+                <span class="category-label">Tropical</span>
+            </a>
+            <a href="#" class="category-item">
+                <span class="category-icon">🎿</span>
+                <span class="category-label">Ski</span>
+            </a>
+            <a href="#" class="category-item">
+                <span class="category-icon">🏕️</span>
+                <span class="category-label">Camping</span>
+            </a>
+            <a href="#" class="category-item">
+                <span class="category-icon">🌲</span>
+                <span class="category-label">Nature</span>
+            </a>
+            <a href="#" class="category-item">
+                <span class="category-icon">🏙️</span>
+                <span class="category-label">Urbain</span>
+            </a>
+        </div>
+    </section> #}
+
+    <!-- Properties -->
+    <main class="container" id="properties">
+        <h2 class="section-title">Logements populaires</h2>
+        <div class="property-grid">
+            {% if properties is empty %}
+                <p style="grid-column: 1 / -1; text-align: center; color: #717171; padding: 40px 0;">
+                    Aucune propriété disponible pour le moment.
+                </p>
+            {% else %}
+                {% for property in properties %}
+                    {% set imageUrl = 'https://picsum.photos/seed/property' ~ property.id ~ '/400/300' %}
+                    {% set rating = (40 + (property.id % 10)) / 10 %}
+                    {% include 'home/parts/property-card.html.twig' with {
+                        'property': property, 
+                        'imageUrl': imageUrl, 
+                        'rating': rating
+                    } %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Inspiration -->
+    <section class="container">
+        <h2 class="section-title">S'inspirer pour son prochain voyage</h2>
+        <div class="inspiration-grid">
+            <a href="#" class="inspiration-card">
+                <div class="inspiration-image">
+                    <img src="https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=400&h=300&fit=crop" alt="Destinations de plage" loading="lazy">
+                </div>
+                <h3>Destinations de plage</h3>
+            </a>
+            <a href="#" class="inspiration-card">
+                <div class="inspiration-image">
+                    <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop" alt="Escapades en montagne" loading="lazy">
+                </div>
+                <h3>Escapades en montagne</h3>
+            </a>
+            <a href="#" class="inspiration-card">
+                <div class="inspiration-image">
+                    <img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400&h=300&fit=crop" alt="Villes culturelles" loading="lazy">
+                </div>
+                <h3>Villes culturelles</h3>
+            </a>
+            <a href="#" class="inspiration-card">
+                <div class="inspiration-image">
+                    <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop" alt="Retraites nature" loading="lazy">
+                </div>
+                <h3>Retraites nature</h3>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    {% include 'parts/footer.html.twig' %}
+{% endblock %}

@@ -1,0 +1,898 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ property.title }} - Airbnb{% endblock %}
+
+{% block stylesheets %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        color: #222;
+        line-height: 1.5;
+    }
+
+    /* Header / Navbar */
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-bottom: 1px solid #ebebeb;
+        z-index: 100;
+        padding: 20px 80px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 24px;
+        font-weight: 700;
+        color: #FF385C;
+        text-decoration: none;
+    }
+
+    .logo svg {
+        width: 32px;
+        height: 32px;
+        fill: #FF385C;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 40px;
+        padding: 8px 8px 8px 24px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        transition: box-shadow 0.2s;
+        cursor: pointer;
+    }
+
+    .search-bar:hover {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+    }
+
+    .search-bar input {
+        border: none;
+        outline: none;
+        font-size: 14px;
+        padding: 0 16px;
+        min-width: 200px;
+    }
+
+    .search-bar .divider {
+        width: 1px;
+        height: 24px;
+        background: #ddd;
+    }
+
+    .search-btn {
+        background: #FF385C;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: white;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .nav-link {
+        text-decoration: none;
+        color: #222;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 22px;
+        transition: background 0.2s;
+    }
+
+    .nav-link:hover {
+        background: #f7f7f7;
+    }
+
+    .user-menu {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid #ddd;
+        border-radius: 21px;
+        padding: 5px 5px 5px 12px;
+        cursor: pointer;
+        transition: box-shadow 0.2s;
+    }
+
+    .user-menu:hover {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+    }
+
+    .hamburger {
+        width: 16px;
+        height: 16px;
+    }
+
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #717171;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+    }
+
+    /* Main Content */
+    .property-container {
+        margin-top: 80px;
+        padding: 40px 80px;
+        max-width: 1280px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Property Header */
+    .property-header {
+        margin-bottom: 24px;
+    }
+
+    .property-title {
+        font-size: 32px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .property-subtitle {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 14px;
+    }
+
+    .subtitle-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .rating-badge {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 600;
+    }
+
+    /* Image Gallery */
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(2, 250px);
+        gap: 8px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 48px;
+    }
+
+    .gallery-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+        transition: filter 0.3s;
+    }
+
+    .gallery-image:hover {
+        filter: brightness(0.9);
+    }
+
+    .gallery-main {
+        grid-column: 1 / 3;
+        grid-row: 1 / 3;
+    }
+
+    /* Property Content */
+    .property-content {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 80px;
+    }
+
+    /* Left Column */
+    .property-details {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    .host-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #ebebeb;
+    }
+
+    .host-details h2 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .host-details p {
+        color: #717171;
+        font-size: 14px;
+    }
+
+    .host-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    .features {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        padding-bottom: 32px;
+        border-bottom: 1px solid #ebebeb;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .feature-icon {
+        font-size: 24px;
+        width: 32px;
+        flex-shrink: 0;
+    }
+
+    .feature-content h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .feature-content p {
+        font-size: 14px;
+        color: #717171;
+    }
+
+    .description {
+        padding-bottom: 32px;
+        border-bottom: 1px solid #ebebeb;
+    }
+
+    .description h3 {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .description p {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #222;
+    }
+
+    .amenities {
+        padding-bottom: 32px;
+        border-bottom: 1px solid #ebebeb;
+    }
+
+    .amenities h3 {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 24px;
+    }
+
+    .amenities-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .amenity-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 16px;
+    }
+
+    .amenity-icon {
+        font-size: 24px;
+    }
+
+    /* Reviews Section */
+    .reviews-section {
+        padding-bottom: 32px;
+        border-bottom: 1px solid #ebebeb;
+    }
+
+    .reviews-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 32px;
+    }
+
+    .reviews-header h3 {
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+    }
+
+    .review-card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .review-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .reviewer-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    .reviewer-info h4 {
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .reviewer-info p {
+        font-size: 14px;
+        color: #717171;
+    }
+
+    .review-text {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #222;
+    }
+
+    /* Right Column - Booking Card */
+    .booking-card {
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+
+    .booking-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .price-info {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+    }
+
+    .price-amount {
+        font-size: 28px;
+        font-weight: 600;
+    }
+
+    .price-label {
+        font-size: 16px;
+        color: #717171;
+    }
+
+    .booking-rating {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 14px;
+    }
+
+    .booking-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .date-inputs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .date-input {
+        padding: 12px;
+        border: none;
+        outline: none;
+        font-size: 14px;
+    }
+
+    .date-input:first-child {
+        border-right: 1px solid #ddd;
+    }
+
+    .guests-input {
+        padding: 16px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .guests-input:focus {
+        border-color: #222;
+    }
+
+    .btn-reserve {
+        width: 100%;
+        background: linear-gradient(to right, #E61E4D 0%, #E31C5F 50%, #D70466 100%);
+        color: white;
+        border: none;
+        padding: 16px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .btn-reserve:hover {
+        transform: scale(1.02);
+    }
+
+    .booking-note {
+        text-align: center;
+        font-size: 14px;
+        color: #717171;
+    }
+
+    .price-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-top: 16px;
+        margin-top: 16px;
+        border-top: 1px solid #ebebeb;
+    }
+
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 16px;
+    }
+
+    .price-row.total {
+        font-weight: 600;
+        padding-top: 12px;
+        border-top: 1px solid #ebebeb;
+    }
+
+    /* Location Map */
+    .location-section {
+        padding-bottom: 48px;
+    }
+
+    .location-section h3 {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .location-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        margin-bottom: 24px;
+    }
+
+    .map-placeholder {
+        width: 100%;
+        height: 400px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+    }
+
+    /* Footer */
+    .footer {
+        background: #f7f7f7;
+        border-top: 1px solid #ebebeb;
+        padding: 48px 80px;
+    }
+
+    .footer-content {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 48px;
+        margin-bottom: 48px;
+    }
+
+    .footer-section h4 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .footer-links {
+        list-style: none;
+    }
+
+    .footer-links li {
+        margin-bottom: 12px;
+    }
+
+    .footer-links a {
+        color: #222;
+        text-decoration: none;
+        font-size: 14px;
+        transition: text-decoration 0.2s;
+    }
+
+    .footer-links a:hover {
+        text-decoration: underline;
+    }
+
+    .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 24px;
+        border-top: 1px solid #ddd;
+        font-size: 14px;
+        color: #717171;
+    }
+
+    .footer-social {
+        display: flex;
+        gap: 24px;
+    }
+
+    .footer-social a {
+        color: #222;
+        text-decoration: none;
+        font-size: 18px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .property-container {
+            padding: 40px 40px;
+        }
+
+        .property-content {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        .booking-card {
+            position: static;
+        }
+
+        .image-gallery {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .reviews-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .property-container {
+            padding: 24px;
+        }
+
+        .header {
+            padding: 20px 24px;
+        }
+
+        .search-bar {
+            display: none;
+        }
+
+        .property-title {
+            font-size: 24px;
+        }
+
+        .image-gallery {
+            grid-template-columns: 1fr;
+            grid-template-rows: repeat(5, 200px);
+        }
+
+        .gallery-main {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .amenities-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <!-- Header -->
+    {% include 'parts/header.html.twig' %}
+
+    <!-- Property Container -->
+    <div class="property-container">
+        <!-- Property Header -->
+        <div class="property-header">
+            <h1 class="property-title">{{ property.title }}</h1>
+            <div class="property-subtitle">
+                {% if property.reviews|length > 0 %}
+                    <div class="subtitle-item rating-badge">
+                        <span>⭐</span>
+                        <span>{{ (property.reviews|reduce((carry, review) => carry + review.rating, 0) / property.reviews|length)|number_format(1) }}</span>
+                        <span>({{ property.reviews|length }} avis)</span>
+                    </div>
+                {% endif %}
+                <div class="subtitle-item">
+                    📍 {{ property.city }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Gallery -->
+        <div class="image-gallery">
+            <img src="https://picsum.photos/seed/property{{ property.id }}/800/500" alt="{{ property.title }}" class="gallery-image gallery-main">
+            <img src="https://picsum.photos/seed/property{{ property.id }}a/400/250" alt="{{ property.title }}" class="gallery-image">
+            <img src="https://picsum.photos/seed/property{{ property.id }}b/400/250" alt="{{ property.title }}" class="gallery-image">
+            <img src="https://picsum.photos/seed/property{{ property.id }}c/400/250" alt="{{ property.title }}" class="gallery-image">
+            <img src="https://picsum.photos/seed/property{{ property.id }}d/400/250" alt="{{ property.title }}" class="gallery-image">
+        </div>
+
+        <!-- Property Content -->
+        <div class="property-content">
+            <!-- Left Column -->
+            <div class="property-details">
+                <!-- Host Info -->
+                <div class="host-info">
+                    <div class="host-details">
+                        <h2>Logement entier hébergé par {{ property.host.firstName }} {{ property.host.lastName }}</h2>
+                        <p>
+                            {{ property.maxGuests }} voyageurs · 
+                            {{ property.bedrooms }} chambre{{ property.bedrooms > 1 ? 's' : '' }} · 
+                            {{ property.bathrooms }} salle{{ property.bathrooms > 1 ? 's' : '' }} de bain
+                        </p>
+                    </div>
+                    <div class="host-avatar">
+                        {{ property.host.firstName|first }}{{ property.host.lastName|first }}
+                    </div>
+                </div>
+
+                <!-- Features -->
+                <div class="features">
+                    <div class="feature-item">
+                        <div class="feature-icon">🏠</div>
+                        <div class="feature-content">
+                            <h3>Logement entier</h3>
+                            <p>Vous aurez le logement rien que pour vous.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">✨</div>
+                        <div class="feature-content">
+                            <h3>Propreté irréprochable</h3>
+                            <p>Ce logement s'engage à suivre les normes de nettoyage renforcées d'Airbnb.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📍</div>
+                        <div class="feature-content">
+                            <h3>Emplacement idéal</h3>
+                            <p>100 % des voyageurs récents ont attribué 5 étoiles à l'emplacement.</p>
+                        </div>
+                    </div>
+                    {% if property.note %}
+                    <div class="feature-item">
+                        <div class="feature-icon">⭐</div>
+                        <div class="feature-content">
+                            <h3>Très bien noté</h3>
+                            <p>Note moyenne de {{ property.note }}/5 par nos voyageurs.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="description">
+                    <h3>À propos de ce logement</h3>
+                    <p>{{ property.description }}</p>
+                </div>
+
+                <!-- Amenities -->
+                <div class="amenities">
+                    <h3>Ce que propose ce logement</h3>
+                    <div class="amenities-grid">
+                        <div class="amenity-item">
+                            <span class="amenity-icon">📶</span>
+                            <span>WiFi</span>
+                        </div>
+                        <div class="amenity-item">
+                            <span class="amenity-icon">🅿️</span>
+                            <span>Parking gratuit</span>
+                        </div>
+                        <div class="amenity-item">
+                            <span class="amenity-icon">🍳</span>
+                            <span>Cuisine</span>
+                        </div>
+                        <div class="amenity-item">
+                            <span class="amenity-icon">📺</span>
+                            <span>Télévision</span>
+                        </div>
+                        <div class="amenity-item">
+                            <span class="amenity-icon">❄️</span>
+                            <span>Climatisation</span>
+                        </div>
+                        <div class="amenity-item">
+                            <span class="amenity-icon">🔥</span>
+                            <span>Chauffage</span>
+                        </div>
+                        <div class="amenity-item">
+                            <span class="amenity-icon">🧺</span>
+                            <span>Lave-linge</span>
+                        </div>
+                        <div class="amenity-item">
+                            <span class="amenity-icon">🔒</span>
+                            <span>Coffre-fort</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews -->
+                {% if property.reviews|length > 0 %}
+                <div class="reviews-section">
+                    <div class="reviews-header">
+                        <span>⭐</span>
+                        <h3>{{ (property.reviews|reduce((carry, review) => carry + review.rating, 0) / property.reviews|length)|number_format(1) }} · {{ property.reviews|length }} avis</h3>
+                    </div>
+                    <div class="reviews-grid">
+                        {% for review in property.reviews|slice(0, 6) %}
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="reviewer-avatar">
+                                    {{ review.guest.firstName|first }}{{ review.guest.lastName|first }}
+                                </div>
+                                <div class="reviewer-info">
+                                    <h4>{{ review.guest.firstName }} {{ review.guest.lastName }}</h4>
+                                    <p>{{ review.createdAt|date('F Y') }}</p>
+                                </div>
+                            </div>
+                            <div class="review-rating">
+                                {% for i in 1..5 %}
+                                    <span>{{ i <= review.rating ? '⭐' : '☆' }}</span>
+                                {% endfor %}
+                            </div>
+                            <p class="review-text">{{ review.comment ?? 'Excellent séjour !' }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Location -->
+                <div class="location-section">
+                    <h3>Où vous allez loger</h3>
+                    <div class="location-info">
+                        <span>📍</span>
+                        <span>{{ property.address }}, {{ property.city }}</span>
+                    </div>
+                    <div class="map-placeholder">
+                        🗺️ Carte interactive (à implémenter)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Booking Card -->
+            <div class="booking-card">
+                <div class="booking-header">
+                    <div class="price-info">
+                        <span class="price-amount">{{ property.pricePerNight|number_format(0, ',', ' ') }} €</span>
+                        <span class="price-label">/ nuit</span>
+                    </div>
+                    {% if property.reviews|length > 0 %}
+                    <div class="booking-rating">
+                        <span>⭐</span>
+                        <span>{{ (property.reviews|reduce((carry, review) => carry + review.rating, 0) / property.reviews|length)|number_format(1) }}</span>
+                        <span>({{ property.reviews|length }})</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <form class="booking-form">
+                    <div class="date-inputs">
+                        <input type="date" class="date-input" placeholder="Arrivée" required>
+                        <input type="date" class="date-input" placeholder="Départ" required>
+                    </div>
+                    
+                    <select class="guests-input" required>
+                        <option value="">Nombre de voyageurs</option>
+                        {% for i in 1..property.maxGuests %}
+                            <option value="{{ i }}">{{ i }} voyageur{{ i > 1 ? 's' : '' }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit" class="btn-reserve">Réserver</button>
+
+                    <p class="booking-note">Vous ne serez pas encore débité</p>
+
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <span>{{ property.pricePerNight|number_format(0, ',', ' ') }} € x 5 nuits</span>
+                            <span>{{ (property.pricePerNight * 5)|number_format(0, ',', ' ') }} €</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Frais de service</span>
+                            <span>{{ (property.pricePerNight * 5 * 0.14)|number_format(0, ',', ' ') }} €</span>
+                        </div>
+                        <div class="price-row total">
+                            <span>Total</span>
+                            <span>{{ (property.pricePerNight * 5 * 1.14)|number_format(0, ',', ' ') }} €</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    {% include 'parts/footer.html.twig' %}
+{% endblock %}
