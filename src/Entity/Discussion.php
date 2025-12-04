@@ -23,6 +23,10 @@ class Discussion
     #[ORM\JoinColumn(nullable: false)]
     private ?Book $book = null;
 
+    #[ORM\ManyToOne(inversedBy: 'discussions')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +64,18 @@ class Discussion
     public function setBook(?Book $book): static
     {
         $this->book = $book;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

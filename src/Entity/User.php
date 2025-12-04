@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -31,6 +33,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    /**
+     * @var Collection<int, Discussion>
+     */
+    #[ORM\OneToMany(targetEntity: Discussion::class, mappedBy: 'owner')]
+    private Collection $discussions;
+
+    public function __construct()
+    {
+        $this->discussions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -111,5 +124,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // @deprecated, to be removed when upgrading to Symfony 8
+    }
+
+    /**
+     * @return Collection<int, Discussion>
+     */
+    public function getDiscussions(): Collection
+    {
+        return $this->discussions;
+    }
+
+    public function addDiscussion(Discussion $discussion): static
+    {
+        if (!$this->discussions->contains($discussion)) {
+            $this->discussions->add($discussion);
+            $discussion->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDiscussion(Discussion $discussion): static
+    {
+        if ($this->discussions->removeElement($discussion)) {
+            // set the owning side to null (unless already changed)
+            if ($discussion->getOwner() === $this) {
+                $discussion->setOwner(null);
+            }
+        }
+
+        return $this;
     }
 }
