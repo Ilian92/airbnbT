@@ -40,4 +40,41 @@ class BookRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function searchBooks(?string $query, ?int $authorId, ?int $genreId, ?int $minPrice, ?int $maxPrice): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->leftJoin('b.author', 'a')
+            ->leftJoin('b.genre', 'g')
+            ->addSelect('a', 'g');
+
+        if ($query) {
+            $qb->andWhere('b.name LIKE :query OR a.name LIKE :query OR a.lastName LIKE :query')
+                ->setParameter('query', '%' . $query . '%');
+        }
+
+        if ($authorId) {
+            $qb->andWhere('a.id = :authorId')
+                ->setParameter('authorId', $authorId);
+        }
+
+        if ($genreId) {
+            $qb->andWhere(':genreId MEMBER OF b.genre')
+                ->setParameter('genreId', $genreId);
+        }
+
+        if ($minPrice) {
+            $qb->andWhere('b.price >= :minPrice')
+                ->setParameter('minPrice', $minPrice);
+        }
+
+        if ($maxPrice) {
+            $qb->andWhere('b.price <= :maxPrice')
+                ->setParameter('maxPrice', $maxPrice);
+        }
+
+        return $qb->orderBy('b.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
