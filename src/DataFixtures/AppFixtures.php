@@ -35,6 +35,15 @@ class AppFixtures extends Fixture
             $manager->persist($user);
         }
 
+        // Créer un utilisateur banni
+        $banned = new User();
+        $banned->setEmail('banned@example.com');
+        $banned->setRoles(['ROLE_BANNED']);
+        $banned->setPassword(
+            $this->passwordHasher->hashPassword($banned, 'mdp')
+        );
+        $manager->persist($banned);
+
         $manager->flush();
     }
 }   
