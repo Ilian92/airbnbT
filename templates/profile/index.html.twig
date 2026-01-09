@@ -1,20 +1,71 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ProfileController!{% endblock %}
+{% block title %}Mon profil{% endblock %}
 
 {% block body %}
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    .profile-wrapper { margin: 2em auto; max-width: 900px; width: 95%; font: 16px/1.5 sans-serif; }
+    .profile-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .profile-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; }
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .profile-label { color: #666; font-size: 0.9em; margin-bottom: 4px; }
+    .profile-value { font-weight: 600; }
+    .badge { display: inline-block; background: #f5f5f5; border: 1px solid #ddd; border-radius: 999px; padding: 2px 10px; font-size: 0.85em; margin-right: 6px; margin-top: 6px; }
+    .section-title { margin: 18px 0 10px; font-size: 1.05em; }
+    .muted { color: #777; }
+    .actions a { margin-left: 10px; }
+    @media (max-width: 700px) {
+        .profile-grid { grid-template-columns: 1fr; }
+    }
 </style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+<div class="profile-wrapper">
+    <div class="profile-header">
+        <h1>Mon profil</h1>
+        <div class="actions">
+            <a href="{{ path('app_logout') }}">Se déconnecter</a>
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_book_index') }}">Administration</a>
+            {% endif %}
+        </div>
+    </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/Users/ilian/Dev/Decode/Symfony/airbnbT/src/Controller/ProfileController.php</code></li>
-        <li>Your template at <code>/Users/ilian/Dev/Decode/Symfony/airbnbT/templates/profile/index.html.twig</code></li>
-    </ul>
+    {% if not app.user %}
+        <div class="profile-card">
+            <p class="muted">Vous n'êtes pas connecté.</p>
+            <a href="{{ path('app_login') }}">Se connecter</a>
+        </div>
+    {% else %}
+        <div class="profile-card">
+            <div class="profile-grid">
+                <div>
+                    <div class="profile-label">Email</div>
+                    <div class="profile-value">{{ app.user.userIdentifier }}</div>
+                </div>
+                <div>
+                    <div class="profile-label">Rôles</div>
+                    <div>
+                        {% for role in app.user.roles %}
+                            <span class="badge">{{ role }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Mes discussions</div>
+            {% if app.user.discussions is defined and app.user.discussions|length > 0 %}
+                <ul>
+                    {% for discussion in app.user.discussions %}
+                        <li>
+                            <strong>{{ discussion.title }}</strong>
+                            <span class="muted">— sur « {{ discussion.book.name }} »</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">Vous n'avez pas encore créé de discussion.</p>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
