@@ -49,8 +49,19 @@ class BookRepository extends ServiceEntityRepository
             ->addSelect('a');
 
         if ($query) {
-            $qb->andWhere('b.name LIKE :query OR a.name LIKE :query OR a.lastName LIKE :query')
-                ->setParameter('query', '%' . $query . '%');
+            $terms = preg_split('/\s+/', trim($query)) ?: [];
+            $terms = array_values(array_filter($terms, static fn(string $t) => $t !== ''));
+
+            foreach ($terms as $index => $term) {
+                $paramName = 'term_' . $index;
+                $qb->andWhere(
+                    sprintf(
+                        '(LOWER(b.name) LIKE :%1$s OR LOWER(a.name) LIKE :%1$s OR LOWER(a.lastName) LIKE :%1$s)',
+                        $paramName
+                    )
+                )
+                    ->setParameter($paramName, '%' . mb_strtolower($term) . '%');
+            }
         }
 
         if ($authorId) {
@@ -109,8 +120,19 @@ class BookRepository extends ServiceEntityRepository
             ->addSelect('a');
 
         if ($query) {
-            $qb->andWhere('b.name LIKE :query OR a.name LIKE :query OR a.lastName LIKE :query')
-                ->setParameter('query', '%' . $query . '%');
+            $terms = preg_split('/\s+/', trim($query)) ?: [];
+            $terms = array_values(array_filter($terms, static fn(string $t) => $t !== ''));
+
+            foreach ($terms as $index => $term) {
+                $paramName = 'term_' . $index;
+                $qb->andWhere(
+                    sprintf(
+                        '(LOWER(b.name) LIKE :%1$s OR LOWER(a.name) LIKE :%1$s OR LOWER(a.lastName) LIKE :%1$s)',
+                        $paramName
+                    )
+                )
+                    ->setParameter($paramName, '%' . mb_strtolower($term) . '%');
+            }
         }
 
         if ($authorId) {
