@@ -12,11 +12,11 @@
             <p>Connecté en tant que : <strong>{{ app.user.userIdentifier }}</strong></p>
             
             {% if is_granted('ROLE_ADMIN') %}
-                <a href="#" class="btn">Accéder à l'administration</a>
+                <a href="{{ path('app_book_index') }}" class="btn">Accéder à l'administration</a>
             {% endif %}
             
             {% if is_granted('ROLE_USER') %}
-                <a href="#" class="btn">Mon profil</a>
+                <a href="{{ path('app_profile') }}" class="btn">Mon profil</a>
             {% endif %}
             
             <a href="{{ path('app_logout') }}" class="btn btn-logout">Se déconnecter</a>
