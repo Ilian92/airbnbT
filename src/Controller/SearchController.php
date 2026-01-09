@@ -19,18 +19,43 @@ final class SearchController extends AbstractController
         AuthorRepository $authorRepository,
         GenreRepository $genreRepository
     ): Response {
-        $query = $request->query->get('q');
-        $authorId = $request->query->get('author');
-        $genreId = $request->query->get('genre');
-        $minPrice = $request->query->get('min_price');
-        $maxPrice = $request->query->get('max_price');
+        $query = $request->query->getString('q');
+        $query = trim($query) !== '' ? trim($query) : null;
 
-        $books = $bookRepository->searchBooks($query, $authorId, $genreId, $minPrice, $maxPrice);
+        $authorIdRaw = $request->query->get('author');
+        $authorId = is_numeric($authorIdRaw) ? (int) $authorIdRaw : null;
+
+        $genreIdRaw = $request->query->get('genre');
+        $genreId = is_numeric($genreIdRaw) ? (int) $genreIdRaw : null;
+
+        $minPriceRaw = $request->query->get('min_price');
+        $minPrice = is_numeric($minPriceRaw) ? (int) $minPriceRaw : null;
+
+        $maxPriceRaw = $request->query->get('max_price');
+        $maxPrice = is_numeric($maxPriceRaw) ? (int) $maxPriceRaw : null;
+
+        $sort = $request->query->getString('sort', 'name');
+        $direction = $request->query->getString('direction', 'asc');
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = $request->query->getInt('limit', 12);
+
+        $pagination = $bookRepository->searchBooksPaginated(
+            $query,
+            $authorId,
+            $genreId,
+            $minPrice,
+            $maxPrice,
+            $sort,
+            $direction,
+            $page,
+            $limit,
+        );
         $authors = $authorRepository->findAll();
         $genres = $genreRepository->findAll();
 
         return $this->render('search/index.html.twig', [
-            'books' => $books,
+            'books' => $pagination['items'],
+            'pagination' => $pagination,
             'authors' => $authors,
             'genres' => $genres,
             'currentQuery' => $query,
@@ -38,6 +63,8 @@ final class SearchController extends AbstractController
             'currentGenre' => $genreId,
             'currentMinPrice' => $minPrice,
             'currentMaxPrice' => $maxPrice,
+            'currentSort' => $sort,
+            'currentDirection' => strtolower($direction),
         ]);
     }
 }

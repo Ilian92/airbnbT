@@ -24,12 +24,20 @@
     .genre-tag { display: inline-block; background: #e3f2fd; color: #1976D2; padding: 3px 8px; border-radius: 3px; font-size: 0.85em; margin-right: 5px; margin-top: 5px; }
     .results-count { margin-bottom: 20px; color: #666; }
     .no-results { text-align: center; padding: 40px; color: #999; }
+    .filters-active { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; }
+    .filters-active strong { display: block; margin-bottom: 6px; }
+    .pill { display: inline-block; background: #f5f5f5; border: 1px solid #ddd; border-radius: 999px; padding: 2px 10px; font-size: 0.9em; margin-right: 6px; margin-top: 6px; }
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 24px 0 10px; flex-wrap: wrap; }
+    .page-link { display: inline-block; padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; background: #fff; text-decoration: none; color: #333; }
+    .page-link[aria-current="page"] { background: #e3f2fd; border-color: #90caf9; }
+    .page-link.disabled { pointer-events: none; opacity: 0.5; }
 </style>
 
 <div class="search-container">
     <h1>Recherche de livres</h1>
     
     <form method="get" action="{{ path('app_search') }}" class="search-form">
+        <input type="hidden" name="page" value="1">
         <div class="form-row">
             <div class="form-group">
                 <label for="q">Recherche par titre ou auteur</label>
@@ -74,6 +82,35 @@
                 <input type="number" id="max_price" name="max_price" value="{{ currentMaxPrice }}" placeholder="9999">
             </div>
         </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="sort">Trier par</label>
+                <select id="sort" name="sort">
+                    <option value="name" {% if currentSort == 'name' %}selected{% endif %}>Nom</option>
+                    <option value="price" {% if currentSort == 'price' %}selected{% endif %}>Prix</option>
+                    <option value="author" {% if currentSort == 'author' %}selected{% endif %}>Auteur</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="direction">Ordre</label>
+                <select id="direction" name="direction">
+                    <option value="asc" {% if currentDirection == 'asc' %}selected{% endif %}>Croissant</option>
+                    <option value="desc" {% if currentDirection == 'desc' %}selected{% endif %}>Décroissant</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="limit">Résultats par page</label>
+                <select id="limit" name="limit">
+                    <option value="6" {% if pagination is defined and pagination.limit == 6 %}selected{% endif %}>6</option>
+                    <option value="12" {% if pagination is defined and pagination.limit == 12 %}selected{% endif %}>12</option>
+                    <option value="24" {% if pagination is defined and pagination.limit == 24 %}selected{% endif %}>24</option>
+                    <option value="48" {% if pagination is defined and pagination.limit == 48 %}selected{% endif %}>48</option>
+                </select>
+            </div>
+        </div>
         
         <div>
             <button type="submit" class="btn-search">Rechercher</button>
@@ -82,8 +119,24 @@
     </form>
     
     {% if books is defined %}
+        {% set hasActiveFilters = currentQuery or currentAuthor or currentGenre or currentMinPrice is not null or currentMaxPrice is not null %}
+        {% if hasActiveFilters %}
+            <div class="filters-active">
+                <strong>Filtres actifs</strong>
+                {% if currentQuery %}<span class="pill">Recherche: "{{ currentQuery }}"</span>{% endif %}
+                {% if currentAuthor %}<span class="pill">Auteur ID: {{ currentAuthor }}</span>{% endif %}
+                {% if currentGenre %}<span class="pill">Genre ID: {{ currentGenre }}</span>{% endif %}
+                {% if currentMinPrice is not null %}<span class="pill">Min: {{ currentMinPrice }}c</span>{% endif %}
+                {% if currentMaxPrice is not null %}<span class="pill">Max: {{ currentMaxPrice }}c</span>{% endif %}
+            </div>
+        {% endif %}
+
         <div class="results-count">
-            {{ books|length }} livre(s) trouvé(s)
+            {% if pagination is defined %}
+                {{ pagination.total }} livre(s) trouvé(s) — page {{ pagination.page }} / {{ pagination.pages }}
+            {% else %}
+                {{ books|length }} livre(s) trouvé(s)
+            {% endif %}
         </div>
         
         {% if books|length > 0 %}
@@ -101,6 +154,26 @@
                     </div>
                 {% endfor %}
             </div>
+
+            {% if pagination is defined and pagination.pages > 1 %}
+                {% set queryParams = app.request.query.all %}
+                <div class="pagination" aria-label="Pagination">
+                    {% set prevPage = pagination.page - 1 %}
+                    {% set nextPage = pagination.page + 1 %}
+
+                    <a class="page-link {{ pagination.page <= 1 ? 'disabled' : '' }}" href="{{ path('app_search', queryParams|merge({'page': prevPage})) }}">Précédent</a>
+
+                    {% for p in 1..pagination.pages %}
+                        {% if p == 1 or p == pagination.pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %}
+                            <a class="page-link" href="{{ path('app_search', queryParams|merge({'page': p})) }}" {% if p == pagination.page %}aria-current="page"{% endif %}>{{ p }}</a>
+                        {% elseif p == pagination.page - 3 or p == pagination.page + 3 %}
+                            <span class="page-link disabled">…</span>
+                        {% endif %}
+                    {% endfor %}
+
+                    <a class="page-link {{ pagination.page >= pagination.pages ? 'disabled' : '' }}" href="{{ path('app_search', queryParams|merge({'page': nextPage})) }}">Suivant</a>
+                </div>
+            {% endif %}
         {% else %}
             <div class="no-results">
                 <p>Aucun livre ne correspond à vos critères de recherche.</p>
