@@ -65,6 +65,28 @@ Après chargement des fixtures (commande `doctrine:fixtures:load`):
 -   Page banni: `/banned` (route `app_banned`)
 -   Recherche (bonus): `/search` (route `app_search`)
 
+## Recherche / Filtres (page `/search`)
+
+-   URL: `/search` (route `app_search`)
+-   Controller: [src/Controller/SearchController.php](src/Controller/SearchController.php)
+-   Repository (requête + pagination): [src/Repository/BookRepository.php](src/Repository/BookRepository.php)
+-   Template: [templates/search/index.html.twig](templates/search/index.html.twig)
+
+### Paramètres GET disponibles
+
+-   `q` : recherche (titre du livre ou auteur)
+-   `author` : id auteur
+-   `genre` : id genre
+-   `min_price` / `max_price` : fourchette de prix (en centimes)
+-   `sort` : `name` | `price` | `author`
+-   `direction` : `asc` | `desc`
+-   `page` : pagination (>= 1)
+-   `limit` : résultats par page (6/12/24/48)
+
+Exemple:
+
+-   `/search?q=harry&genre=2&sort=price&direction=asc&page=1&limit=12`
+
 ## CRUD (Admin)
 
 Les CRUD sont accessibles via les routes `/admin/*`:
