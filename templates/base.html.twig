@@ -12,6 +12,35 @@
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <header class="site-header">
+            <div class="container header-inner">
+                <a class="brand" href="{{ path('app_home') }}">Bibliothèque</a>
+
+                <nav class="nav">
+                    <a href="{{ path('app_home') }}">Accueil</a>
+                    <a href="{{ path('app_search') }}">Recherche</a>
+
+                    {% if app.user %}
+                        <a href="{{ path('app_profile') }}">Profil</a>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('app_book_index') }}">Admin</a>
+                        {% endif %}
+                    {% endif %}
+                </nav>
+
+                <div class="auth">
+                    {% if app.user %}
+                        <span class="auth-user">{{ app.user.userIdentifier }}</span>
+                        <a class="btn btn-secondary" href="{{ path('app_logout') }}">Se déconnecter</a>
+                    {% else %}
+                        <a class="btn btn-primary" href="{{ path('app_login') }}">Se connecter</a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <main class="container main">
+            {% block body %}{% endblock %}
+        </main>
     </body>
 </html>

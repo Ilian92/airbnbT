@@ -4,25 +4,28 @@
 
 {% block body %}
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}!</h1>
+<div class="page-header">
+    <h1>Accueil</h1>
+</div>
+
+<div class="card">
 
     <div class="user-info">
         {% if app.user %}
             <p>Connecté en tant que : <strong>{{ app.user.userIdentifier }}</strong></p>
             
             {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('app_book_index') }}" class="btn">Accéder à l'administration</a>
+                <a href="{{ path('app_book_index') }}" class="btn btn-secondary">Accéder à l'administration</a>
             {% endif %}
             
             {% if is_granted('ROLE_USER') %}
-                <a href="{{ path('app_profile') }}" class="btn">Mon profil</a>
+                <a href="{{ path('app_profile') }}" class="btn btn-secondary">Mon profil</a>
             {% endif %}
             
-            <a href="{{ path('app_logout') }}" class="btn btn-logout">Se déconnecter</a>
+            <a href="{{ path('app_logout') }}" class="btn btn-secondary">Se déconnecter</a>
         {% else %}
             <p>🔒 Vous n'êtes pas connecté</p>
-            <a href="{{ path('app_login') }}" class="btn">Se connecter</a>
+            <a href="{{ path('app_login') }}" class="btn btn-primary">Se connecter</a>
         {% endif %}
     </div>
 

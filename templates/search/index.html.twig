@@ -3,38 +3,9 @@
 {% block title %}Recherche de livres{% endblock %}
 
 {% block body %}
-<style>
-    .search-container { max-width: 1200px; margin: 2em auto; padding: 0 20px; }
-    .search-form { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-    .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
-    .form-group { flex: 1; min-width: 200px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-    .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-    .btn-search { background: #2196F3; color: white; padding: 10px 30px; border: none; border-radius: 4px; cursor: pointer; }
-    .btn-search:hover { background: #1976D2; }
-    .btn-reset { background: #757575; color: white; padding: 10px 30px; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px; }
-    .btn-reset:hover { background: #616161; }
-    .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-    .book-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; transition: box-shadow 0.3s; }
-    .book-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    .book-title { font-size: 1.2em; font-weight: bold; margin-bottom: 10px; }
-    .book-author { color: #666; margin-bottom: 5px; }
-    .book-price { color: #2196F3; font-weight: bold; font-size: 1.1em; margin-top: 10px; }
-    .book-genres { margin-top: 10px; }
-    .genre-tag { display: inline-block; background: #e3f2fd; color: #1976D2; padding: 3px 8px; border-radius: 3px; font-size: 0.85em; margin-right: 5px; margin-top: 5px; }
-    .results-count { margin-bottom: 20px; color: #666; }
-    .no-results { text-align: center; padding: 40px; color: #999; }
-    .filters-active { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; }
-    .filters-active strong { display: block; margin-bottom: 6px; }
-    .pill { display: inline-block; background: #f5f5f5; border: 1px solid #ddd; border-radius: 999px; padding: 2px 10px; font-size: 0.9em; margin-right: 6px; margin-top: 6px; }
-    .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 24px 0 10px; flex-wrap: wrap; }
-    .page-link { display: inline-block; padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; background: #fff; text-decoration: none; color: #333; }
-    .page-link[aria-current="page"] { background: #e3f2fd; border-color: #90caf9; }
-    .page-link.disabled { pointer-events: none; opacity: 0.5; }
-</style>
-
-<div class="search-container">
+<div class="page-header">
     <h1>Recherche de livres</h1>
+</div>
     
     <form method="get" action="{{ path('app_search') }}" class="search-form">
         <input type="hidden" name="page" value="1">
@@ -113,15 +84,15 @@
         </div>
         
         <div>
-            <button type="submit" class="btn-search">Rechercher</button>
-            <a href="{{ path('app_search') }}" class="btn-reset">Réinitialiser</a>
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+            <a href="{{ path('app_search') }}" class="btn btn-secondary">Réinitialiser</a>
         </div>
     </form>
     
     {% if books is defined %}
         {% set hasActiveFilters = currentQuery or currentAuthor or currentGenre or currentMinPrice is not null or currentMaxPrice is not null %}
         {% if hasActiveFilters %}
-            <div class="filters-active">
+            <div class="card" style="margin-bottom: 16px;">
                 <strong>Filtres actifs</strong>
                 {% if currentQuery %}<span class="pill">Recherche: "{{ currentQuery }}"</span>{% endif %}
                 {% if currentAuthor %}<span class="pill">Auteur ID: {{ currentAuthor }}</span>{% endif %}
@@ -148,7 +119,7 @@
                         <div class="book-price">{{ (book.price / 100)|number_format(2, ',', ' ') }} EUR</div>
                         <div class="book-genres">
                             {% for genre in book.genre %}
-                                <span class="genre-tag">{{ genre.name }}</span>
+                                <span class="pill">{{ genre.name }}</span>
                             {% endfor %}
                         </div>
                     </div>
@@ -175,10 +146,9 @@
                 </div>
             {% endif %}
         {% else %}
-            <div class="no-results">
+            <div class="card" style="text-align: center;">
                 <p>Aucun livre ne correspond à vos critères de recherche.</p>
             </div>
         {% endif %}
     {% endif %}
-</div>
 {% endblock %}
